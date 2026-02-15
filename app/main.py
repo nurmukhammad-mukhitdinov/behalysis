@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.core.logging import setup_logging, logger
@@ -24,6 +25,17 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
+# ── CORS ────────────────────────────────────────────────────────────────────
+# Allows requests from any frontend origin (good for dev / public API).
+# If you need cookies/credentials, see note below.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,  # must be False when allow_origins=["*"]
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # ── Register routers ────────────────────────────────────────────────────────
 app.include_router(schools.router)
 app.include_router(classes.router)
@@ -31,7 +43,7 @@ app.include_router(students.router)
 app.include_router(lesson_reports.router)
 
 
-# ── Global exception handler ───────────────────────────────────────────────
+# ── Global exception handler ────────────────────────────────────────────────
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     logger.exception("Unhandled exception on %s %s", request.method, request.url.path)
