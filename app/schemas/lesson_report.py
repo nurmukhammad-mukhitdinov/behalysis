@@ -17,7 +17,7 @@ class StudentEntryCreate(BaseModel):
 
 class UnrecognizedEntryCreate(BaseModel):
     image: str | None = None
-    attention: int = Field(..., ge=1, le=100)
+    attention: int = Field(..., ge=0, le=100)
 
 
 class StudentEntryResponse(BaseModel):
