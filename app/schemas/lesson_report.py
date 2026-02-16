@@ -12,7 +12,7 @@ class StudentEntryCreate(BaseModel):
     student_id: EightDigitId
     name: str | None = None
     image: str | None = None
-    attention: int = Field(..., ge=1, le=100)
+    attention: int = Field(..., ge=0, le=100)
 
 
 class UnrecognizedEntryCreate(BaseModel):
