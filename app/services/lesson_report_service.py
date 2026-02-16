@@ -46,35 +46,31 @@ async def create_lesson_report(
     db.add(report)
     await db.flush()
 
-    report_dir = get_report_image_dir(report_id)
     all_attentions: list[int] = []
-
-    # Process recognized students
     for entry in data.students:
         await get_or_create_student(db, entry.student_id, data.class_id, entry.name)
-        filename = save_image(entry.image, report_dir) if entry.image else None
         inattention = 100 - entry.attention
-        ae = AttentionEntry(
-            report_id=report_id,
-            student_id=entry.student_id,
-            attention=entry.attention,
-            inattention=inattention,
-            image_path=filename,
+        db.add(
+            AttentionEntry(
+                report_id=report_id,
+                student_id=entry.student_id,
+                attention=entry.attention,
+                inattention=inattention,
+                image_path=None,  # ✅ ignore
+            )
         )
-        db.add(ae)
         all_attentions.append(entry.attention)
 
-    # Process unrecognized students
     for entry in data.unrecognized_students:
-        filename = save_image(entry.image, report_dir) if entry.image else None
         inattention = 100 - entry.attention
-        ue = UnrecognizedEntry(
-            report_id=report_id,
-            attention=entry.attention,
-            inattention=inattention,
-            image_path=filename,
+        db.add(
+            UnrecognizedEntry(
+                report_id=report_id,
+                attention=entry.attention,
+                inattention=inattention,
+                image_path=None,  # ✅ ignore
+            )
         )
-        db.add(ue)
         all_attentions.append(entry.attention)
 
     # Compute averages
@@ -153,38 +149,31 @@ async def update_lesson_report(
             sa_delete(UnrecognizedEntry).where(UnrecognizedEntry.report_id == report_id)
         )
 
-        # Remove old images folder and recreate
-        report_dir = get_report_image_dir(report_id)
-        shutil.rmtree(report_dir, ignore_errors=True)
-        report_dir.mkdir(parents=True, exist_ok=True)
-
         all_attentions: list[int] = []
-
         for entry in data.students:
-            await get_or_create_student(db, entry.student_id, report.class_id, entry.name)
-            filename = save_image(entry.image, report_dir) if entry.image else None
+            await get_or_create_student(db, entry.student_id, data.class_id, entry.name)
             inattention = 100 - entry.attention
-            ae = AttentionEntry(
-                report_id=report_id,
-                student_id=entry.student_id,
-                attention=entry.attention,
-                inattention=inattention,
-                image_path=filename,
+            db.add(
+                AttentionEntry(
+                    report_id=report_id,
+                    student_id=entry.student_id,
+                    attention=entry.attention,
+                    inattention=inattention,
+                    image_path=None,  # ✅ ignore
+                )
             )
-            db.add(ae)
             all_attentions.append(entry.attention)
 
-        unrec = data.unrecognized_students or []
-        for entry in unrec:
-            filename = save_image(entry.image, report_dir) if entry.image else None
+        for entry in data.unrecognized_students:
             inattention = 100 - entry.attention
-            ue = UnrecognizedEntry(
-                report_id=report_id,
-                attention=entry.attention,
-                inattention=inattention,
-                image_path=filename,
+            db.add(
+                UnrecognizedEntry(
+                    report_id=report_id,
+                    attention=entry.attention,
+                    inattention=inattention,
+                    image_path=None,  # ✅ ignore
+                )
             )
-            db.add(ue)
             all_attentions.append(entry.attention)
 
         if all_attentions:
