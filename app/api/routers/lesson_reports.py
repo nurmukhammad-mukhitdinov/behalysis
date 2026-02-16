@@ -21,7 +21,9 @@ from app.core.config import settings
 router = APIRouter(tags=["Lesson Reports"])
 
 
-def _build_image_url(report_id: uuid.UUID, image_path: str) -> str:
+def _build_image_url(report_id: uuid.UUID, image_path: str | None) -> str | None:
+    if not image_path:
+        return None
     return f"/images/{report_id}/{image_path}"
 
 

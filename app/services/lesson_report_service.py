@@ -52,7 +52,7 @@ async def create_lesson_report(
     # Process recognized students
     for entry in data.students:
         await get_or_create_student(db, entry.student_id, data.class_id, entry.name)
-        filename = save_image(entry.image, report_dir)
+        filename = save_image(entry.image, report_dir) if entry.image else None
         inattention = 100 - entry.attention
         ae = AttentionEntry(
             report_id=report_id,
@@ -66,7 +66,7 @@ async def create_lesson_report(
 
     # Process unrecognized students
     for entry in data.unrecognized_students:
-        filename = save_image(entry.image, report_dir)
+        filename = save_image(entry.image, report_dir) if entry.image else None
         inattention = 100 - entry.attention
         ue = UnrecognizedEntry(
             report_id=report_id,
@@ -162,7 +162,7 @@ async def update_lesson_report(
 
         for entry in data.students:
             await get_or_create_student(db, entry.student_id, report.class_id, entry.name)
-            filename = save_image(entry.image, report_dir)
+            filename = save_image(entry.image, report_dir) if entry.image else None
             inattention = 100 - entry.attention
             ae = AttentionEntry(
                 report_id=report_id,
@@ -176,7 +176,7 @@ async def update_lesson_report(
 
         unrec = data.unrecognized_students or []
         for entry in unrec:
-            filename = save_image(entry.image, report_dir)
+            filename = save_image(entry.image, report_dir) if entry.image else None
             inattention = 100 - entry.attention
             ue = UnrecognizedEntry(
                 report_id=report_id,

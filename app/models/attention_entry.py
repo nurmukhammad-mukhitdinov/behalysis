@@ -24,7 +24,7 @@ class AttentionEntry(Base):
     )
     attention: Mapped[int] = mapped_column(Integer, nullable=False)
     inattention: Mapped[int] = mapped_column(Integer, nullable=False)
-    image_path: Mapped[str] = mapped_column(String(500), nullable=False)
+    image_path: Mapped[str | None] = mapped_column(String(...), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=datetime.utcnow
     )
