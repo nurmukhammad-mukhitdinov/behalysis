@@ -11,12 +11,12 @@ from app.schemas.common import EightDigitId
 class StudentEntryCreate(BaseModel):
     student_id: EightDigitId
     name: str | None = None
-    image: str = Field(..., description="Base64-encoded image")
+    image: str | None = None
     attention: int = Field(..., ge=1, le=100)
 
 
 class UnrecognizedEntryCreate(BaseModel):
-    image: str = Field(..., description="Base64-encoded image")
+    image: str | None = None
     attention: int = Field(..., ge=1, le=100)
 
 
@@ -25,7 +25,7 @@ class StudentEntryResponse(BaseModel):
     student_id: int
     attention: int
     inattention: int
-    image_url: str
+    image_url: str | None = None
     created_at: datetime
 
     model_config = {"from_attributes": True}
@@ -35,7 +35,7 @@ class UnrecognizedEntryResponse(BaseModel):
     id: uuid.UUID
     attention: int
     inattention: int
-    image_url: str
+    image_url: str | None = None
     created_at: datetime
 
     model_config = {"from_attributes": True}
